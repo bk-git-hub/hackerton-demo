@@ -120,7 +120,7 @@ const STORAGE_KEY = "connecta_account_settings_v1";
 
 /* ================= 메인 ================= */
 
-export default function AccountSettings() {
+export default function Setting() {
   const menuSections = useMemo(
     () => [
       { title: "회원", items: ["계정", "일정", "관심", "메시지"] },
