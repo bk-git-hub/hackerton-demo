@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   TinderRoot,
   TinderLikeButton,
@@ -6,118 +7,138 @@ import {
   TinderResetButton,
   TinderEmptyFallback,
 } from './Slider';
+import { Rocket, Zap, X, Heart, RefreshCw, Cpu } from 'lucide-react';
 
-// 1. 샘플 데이터 (실제 데이터는 API나 Props에서 가져올 수 있습니다)
+// --- 샘플 데이터 (Orbit 최적화) ---
 const SAMPLE_CARDS = [
   {
     id: 1,
     name: '김철수',
-    age: 24,
-    major: '컴퓨터공학',
+    sq: 98,
+    major: 'Backend / DevOps',
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500',
+    tags: ['Node.js', 'Docker'],
   },
   {
     id: 2,
     name: '이영희',
-    age: 22,
-    major: '산업디자인',
+    sq: 94,
+    major: 'UI/UX Designer',
     image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500',
+    tags: ['Figma', 'Prototyping'],
   },
   {
     id: 3,
     name: '박지민',
-    age: 23,
-    major: '소프트웨어',
+    sq: 89,
+    major: 'Frontend Developer',
     image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=500',
+    tags: ['React', 'Three.js'],
   },
 ];
 
 export default function FindTeamMate() {
   return (
-    <div className="flex h-fit w-full flex-col items-center md:p-4">
-      {/* 상단 헤더 섹션 */}
-      <div className="   text-center">
-        <div className="space-y-2">
-          <h2 className="text-3xl font-black tracking-tight text-slate-900">
-            팀원 찾기
-          </h2>
-          <p className="text-sm leading-relaxed text-slate-500">
-            마음에 드는 팀원을 오른쪽으로 스와이프 하세요!
-          </p>
+    <div className="flex h-fit w-full flex-col items-center bg-transparent">
+      {/* 1. 헤더 섹션: 시스템 스캔 메시지 */}
+      <div className="mb-10 text-center space-y-2">
+        <div className="flex justify-center mb-4">
+          <div className="p-3 bg-blue-600/20 rounded-2xl text-blue-400 animate-pulse">
+            <Cpu size={32} />
+          </div>
         </div>
+        <h2 className="text-2xl font-black italic tracking-tighter text-white uppercase">
+          Crew Discovery Scan
+        </h2>
+        <p className="text-xs font-bold text-slate-500 tracking-widest uppercase">
+          Swipe right to initialize matching
+        </p>
       </div>
 
       {/* 2. 틴더 슬라이더 메인 영역 */}
       <TinderRoot cards={SAMPLE_CARDS}>
-        <div className="relative h-100 w-70 md:h-140 md:w-85">
+        <div className="relative h-[420px] w-[300px] md:h-[500px] md:w-[360px]">
           {SAMPLE_CARDS.map((card, i) => (
             <TinderCard
               key={card.id}
               index={i}
-              className="h-full w-full overflow-hidden rounded-3xl shadow-2xl"
+              className="h-full w-full overflow-hidden rounded-[32px] border border-white/10 bg-slate-900 shadow-2xl"
               style={{
                 backgroundImage: `url(${card.image})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
               }}
             >
-              {/* 카드 내부 정보 오버레이 */}
-              <div className="pointer-events-none absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/90 via-black/40 to-transparent p-6 text-white">
-                <p className="text-sm font-medium text-blue-400">
-                  {card.major}
-                </p>
-                <h3 className="text-2xl font-bold">
-                  {card.name}, <span className="font-light">{card.age}</span>
+              {/* 카드 내부 정보 오버레이 (Glassmorphism) */}
+              <div className="pointer-events-none absolute bottom-0 left-0 w-full bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent p-8 text-white">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-2 py-0.5 bg-blue-600 text-[10px] font-black rounded-md uppercase tracking-wider">
+                    SQ {card.sq}%
+                  </span>
+                  <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">
+                    {card.major}
+                  </span>
+                </div>
+
+                <h3 className="text-3xl font-black tracking-tighter mb-4">
+                  {card.name}
                 </h3>
+
+                <div className="flex gap-2">
+                  {card.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="text-[9px] font-bold px-2 py-1 bg-white/5 border border-white/10 rounded-lg text-slate-400"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
               </div>
+
+              {/* 상단 스캔 라인 효과 (데코레이션) */}
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent animate-scan" />
             </TinderCard>
           ))}
 
-          {/* 모든 카드를 소진했을 때 표시 */}
+          {/* 3. Empty Fallback (스캔 완료 상태) */}
           <TinderEmptyFallback>
-            <div className="flex h-full flex-col items-center justify-center rounded-3xl border-2 border-dashed border-slate-300 bg-white p-8 text-center shadow-inner">
-              <div className="mb-4 text-5xl">🙌</div>
-              <h2 className="text-xl font-bold text-slate-800">
-                모든 인재를 확인했습니다!
+            <div className="flex h-full flex-col items-center justify-center rounded-[32px] border border-white/5 bg-slate-900/50 backdrop-blur-xl p-8 text-center shadow-inner">
+              <div className="mb-6 p-5 bg-slate-800 rounded-full text-slate-500">
+                <RefreshCw size={40} />
+              </div>
+              <h2 className="text-xl font-black text-white italic tracking-tighter uppercase">
+                Scan Complete
               </h2>
-              <p className="mt-2 text-sm text-slate-500">
-                새로운 팀원을 더 기다려볼까요?
+              <p className="mt-2 text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-widest">
+                No more potential <br /> entities found in range
               </p>
-              <TinderResetButton className="mt-8 rounded-full bg-slate-900 px-8 py-3 font-bold text-white transition-all hover:bg-slate-800 active:scale-95">
-                다시 보기
+
+              <TinderResetButton className="mt-10 group flex items-center gap-2 rounded-2xl bg-white px-8 py-4 font-black text-slate-950 transition-all hover:bg-blue-400 active:scale-95 shadow-lg">
+                <RefreshCw
+                  size={18}
+                  className="group-hover:rotate-180 transition-transform duration-500"
+                />
+                RESCAN SECTOR
               </TinderResetButton>
             </div>
           </TinderEmptyFallback>
         </div>
 
-        {/* 3. 하단 컨트롤 버튼 */}
-        <div className="mt-4 flex items-center space-x-10">
-          <TinderNopeButton className="group flex h-16 w-16 cursor-pointer items-center justify-center rounded-full bg-white shadow-lg transition-all hover:bg-red-50 active:scale-90">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8 w-8 text-red-500 transition-transform group-hover:rotate-12"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+        {/* 4. 하단 컨트롤 버튼 (고성능 대시보드 스타일) */}
+        <div className="mt-10 flex items-center space-x-8">
+          <TinderNopeButton className="group flex h-20 w-20 cursor-pointer items-center justify-center rounded-3xl bg-slate-900 border border-white/5 shadow-xl transition-all hover:bg-rose-500/10 hover:border-rose-500/30 active:scale-90">
+            <X
+              size={32}
+              className="text-rose-500 transition-transform group-hover:rotate-90"
+            />
           </TinderNopeButton>
 
-          <TinderLikeButton className="group flex h-16 w-16 cursor-pointer items-center justify-center rounded-full bg-white shadow-lg transition-all hover:bg-green-50 active:scale-90">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8 w-8 text-green-500 transition-transform group-hover:scale-110"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-            </svg>
+          <TinderLikeButton className="group flex h-20 w-20 cursor-pointer items-center justify-center rounded-3xl bg-blue-600 shadow-[0_0_30px_rgba(37,99,235,0.4)] transition-all hover:bg-blue-500 active:scale-90 border border-blue-400/30">
+            <Heart
+              size={32}
+              className="text-white fill-white transition-transform group-hover:scale-110"
+            />
           </TinderLikeButton>
         </div>
       </TinderRoot>

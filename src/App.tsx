@@ -17,7 +17,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<MainHero />} />
         <Route path="/setting" element={<Setting />} />
-        <Route path="/projects/new" element={<TeamCreatePage />} />
+        <Route path="/teams/new" element={<TeamCreatePage />} />
         <Route path="/explore" element={<ProjectGalaxyView />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/projects/:slug" element={<ProjectPage />} />

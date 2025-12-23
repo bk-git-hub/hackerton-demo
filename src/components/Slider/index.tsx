@@ -64,39 +64,54 @@ export const TinderCard = ({
     <div
       ref={isTopCard ? topCardRef : isNextCard ? nextCardRef : null}
       onPointerDown={isTopCard ? handlePointerDown : undefined}
-      // ⬇️ twMerge와 clsx를 사용하여 className을 안전하게 병합합니다.
       className={twMerge(
         clsx(
-          'absolute h-full w-full cursor-grab [touch-action:none] overflow-hidden rounded-xl bg-white shadow-lg transition-transform duration-300 ease-out select-none',
-          className, // 사용자가 전달한 className
+          'absolute h-full w-full cursor-grab [touch-action:none] overflow-hidden rounded-[32px] border border-white/10 bg-slate-900 shadow-2xl transition-transform duration-300 ease-out select-none',
+          className,
         ),
       )}
       style={{
         zIndex: itemCount - index,
         transform: isTopCard
           ? 'none'
-          : `scale(${1 - (index - currentIndex) * 0.1}) translateY(-${
-              (index - currentIndex) * 12
-            }px)`,
+          : `scale(${1 - (index - currentIndex) * 0.05}) translateY(${
+              (index - currentIndex) * 15
+            }px)`, // 뒤의 카드가 아래로 살짝 보이게 수정
         ...style,
       }}
-      {...props} //
+      {...props}
     >
       {children}
+
+      {/* --- Orbit 테마 인디케이터 (LIKE/NOPE) --- */}
       {isTopCard && (
         <>
+          {/* LIKE (APPROVE) 인디케이터 */}
           <div
             ref={likeIndicatorRef}
-            className="pointer-events-none absolute top-10 left-10 -rotate-12 transform rounded-xl border-4 border-green-500 p-2 text-4xl font-bold text-green-500 opacity-0"
+            className="pointer-events-none absolute top-12 left-10 -rotate-12 transform opacity-0 z-50"
           >
-            LIKE
+            <div className="flex items-center gap-2 px-6 py-2 border-4 border-emerald-500 rounded-2xl bg-emerald-500/10 backdrop-blur-md">
+              <span className="text-4xl font-black text-emerald-500 tracking-tighter italic uppercase">
+                Approve
+              </span>
+            </div>
           </div>
+
+          {/* NOPE (REJECT) 인디케이터 */}
           <div
             ref={nopeIndicatorRef}
-            className="pointer-events-none absolute top-10 right-10 rotate-12 transform rounded-xl border-4 border-red-500 p-2 text-4xl font-bold text-red-500 opacity-0"
+            className="pointer-events-none absolute top-12 right-10 rotate-12 transform opacity-0 z-50"
           >
-            NOPE
+            <div className="flex items-center gap-2 px-6 py-2 border-4 border-rose-600 rounded-2xl bg-rose-600/10 backdrop-blur-md">
+              <span className="text-4xl font-black text-rose-600 tracking-tighter italic uppercase">
+                Reject
+              </span>
+            </div>
           </div>
+
+          {/* 스캔 라인 오버레이 (디테일) */}
+          <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] z-10 bg-[length:100%_4px,3px_100%]" />
         </>
       )}
     </div>

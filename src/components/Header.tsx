@@ -17,7 +17,7 @@ export default function Header() {
 
   const navLinks = [
     { name: '팀 탐색', path: '/explore', icon: <Search size={18} /> },
-    { name: '팀 만들기', path: '/create-team', icon: <PlusCircle size={18} /> },
+    { name: '팀 만들기', path: '/teams/new', icon: <PlusCircle size={18} /> },
   ];
 
   return (
@@ -34,12 +34,13 @@ export default function Header() {
           onClick={() => navigate('/')}
           className="flex items-center gap-2.5 cursor-pointer group"
         >
-          <div className="bg-blue-600 p-2 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-transform group-hover:scale-105">
+          {/* <div className="bg-blue-600 p-2 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-transform group-hover:scale-105">
             <Rocket size={20} className="text-white" />
-          </div>
-          <span className="text-xl font-black text-white tracking-tighter uppercase">
-            Orbit
-          </span>
+          </div> */}
+          {/* <span className="text-xl  font-jua  text-blue-500 tracking-tighter">
+            우주매치
+          </span> */}
+          <img src="/logo.svg" alt="logo" width={100} height={40} />
         </div>
 
         {/* 중앙 메뉴 */}
