@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Cpu, Globe, Database, Rocket, Code2, X } from 'lucide-react';
 import { GalaxyLoading } from './GalaxyLoading';
-import { ProjectPlanet } from './ProjectPlanet';
+import { ProjectNode } from './ProjectNode';
+import { ConnectionLines } from './ConnectionLines';
 
 const SAMPLE_PROJECTS = [
   {
@@ -42,18 +43,25 @@ const SAMPLE_PROJECTS = [
   },
 ];
 
-export default function ProjectGalaxyView() {
+export default function ProjectDiscoveryView() {
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [dimensions, setDimensions] = useState({ width: 1200, height: 800 });
   const [isMobile, setIsMobile] = useState(false);
 
-  // 1. 화면 크기 감지 (반응형)
+  // 화면 크기 및 반응형 실시간 감지
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    const handleResize = () => {
+      setDimensions({ width: window.innerWidth, height: window.innerHeight });
+      setIsMobile(window.innerWidth < 768);
+    };
+
     handleResize();
     window.addEventListener('resize', handleResize);
 
+    // 로딩 시뮬레이션 (GalaxyLoading 노출)
     const timer = setTimeout(() => setLoading(false), 2000);
+
     return () => {
       window.removeEventListener('resize', handleResize);
       clearTimeout(timer);
@@ -62,6 +70,7 @@ export default function ProjectGalaxyView() {
 
   const selectedProject = SAMPLE_PROJECTS.find((p) => p.id === selectedId);
 
+  // 🔥 로딩 섹션 복구
   if (loading) return <GalaxyLoading />;
 
   return (
@@ -69,76 +78,112 @@ export default function ProjectGalaxyView() {
       className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-slate-950 touch-none"
       onClick={() => setSelectedId(null)}
     >
-      {/* 배경 장식 (모바일에서는 크기 축소) */}
-      <div
-        className={`absolute rounded-full border border-white/5 ${
-          isMobile ? 'h-64 w-64' : 'h-[500px] w-[500px]'
-        }`}
-      />
-
-      {/* 중앙: ME 노드 */}
-      <div
-        className={`absolute z-20 flex flex-col items-center justify-center rounded-full bg-blue-600 shadow-2xl transition-all
-        ${isMobile ? 'h-16 w-16' : 'h-20 w-20'}`}
-      >
-        <span className="text-[8px] md:text-[10px] text-blue-200">YOU</span>
-        <span className="text-xs md:text-sm font-black text-white">DEV</span>
+      {/* 1. 배경 가이드 라인 (현재 가용 반경에 맞춰 동적 조절) */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        {[0.15, 0.3, 0.42].map((ratio, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full border border-white/[0.02]"
+            style={{
+              width:
+                Math.min(dimensions.width, dimensions.height) * ratio * 2.5,
+              height:
+                Math.min(dimensions.width, dimensions.height) * ratio * 2.5,
+            }}
+          />
+        ))}
       </div>
 
-      {/* 행성들 */}
+      {/* 2. 연결선 레이어 (ProjectNode와 동일한 Viewport Clamping 적용 필요) */}
+      <ConnectionLines
+        projects={SAMPLE_PROJECTS}
+        selectedId={selectedId}
+        isMobile={isMobile}
+        dimensions={dimensions} // 화면 크기 전달
+      />
+
+      {/* 3. 중앙: CORE 노드 */}
+      <div className="relative z-20 flex items-center justify-center">
+        {[1.5, 2.2, 3].map((s, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full border border-blue-500/20"
+            style={{ width: isMobile ? 60 : 80, height: isMobile ? 60 : 80 }}
+            animate={{ scale: [1, s], opacity: [0.4, 0] }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              delay: i * 1,
+              ease: 'easeOut',
+            }}
+          />
+        ))}
+        <motion.div
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+          className={`flex flex-col items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-700 shadow-[0_0_40px_rgba(37,99,235,0.4)] border-2 border-blue-400/20
+          ${isMobile ? 'h-16 w-16' : 'h-24 w-24'}`}
+        >
+          <span className="text-[8px] md:text-[10px] text-blue-200 font-bold uppercase tracking-widest">
+            Analysis
+          </span>
+          <span className="text-xs md:text-sm font-black text-white leading-none">
+            CORE
+          </span>
+        </motion.div>
+      </div>
+
+      {/* 4. 주변 프로젝트 노드들 */}
       <div className="relative flex items-center justify-center">
         {SAMPLE_PROJECTS.map((project, i) => (
-          <ProjectPlanet
+          <ProjectNode
             key={project.id}
             project={project}
             index={i}
             total={SAMPLE_PROJECTS.length}
             isSelected={selectedId === project.id}
             isMobile={isMobile}
+            dimensions={dimensions} // 화면 크기 전달
             onClick={() => setSelectedId(project.id)}
           />
         ))}
       </div>
 
-      {/* 상세 정보창 (모바일: 바텀시트 / 데스크톱: 사이드바) */}
+      {/* 5. 상세 정보창 */}
       <AnimatePresence>
         {selectedProject && (
           <motion.div
-            // 🔥 모바일은 아래에서 위로, 데스크톱은 오른쪽에서 왼쪽으로
-            initial={isMobile ? { y: '100%' } : { x: 300, opacity: 0 }}
+            initial={isMobile ? { y: '100%' } : { x: 400, opacity: 0 }}
             animate={isMobile ? { y: 0 } : { x: 0, opacity: 1 }}
-            exit={isMobile ? { y: '100%' } : { x: 300, opacity: 0 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className={`fixed z-50 bg-slate-900/90 backdrop-blur-2xl border border-white/10 p-6 md:p-8 shadow-2xl
+            exit={isMobile ? { y: '100%' } : { x: 400, opacity: 0 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 200 }}
+            className={`fixed z-50 bg-slate-900/98 backdrop-blur-3xl border border-white/10 p-6 md:p-8 shadow-[0_0_60px_rgba(0,0,0,0.6)]
               ${
                 isMobile
                   ? 'bottom-0 left-0 right-0 rounded-t-[40px] border-t'
-                  : 'right-6 top-6 bottom-6 w-80 rounded-3xl'
+                  : 'right-8 top-8 bottom-8 w-84 rounded-[32px]'
               }`}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* 모바일용 핸들바 */}
             {isMobile && (
-              <div className="mx-auto mb-6 h-1 w-12 rounded-full bg-slate-700" />
+              <div className="mx-auto mb-6 h-1.5 w-12 rounded-full bg-slate-800" />
             )}
-
-            <button
-              onClick={() => setSelectedId(null)}
-              className="absolute right-6 top-6 text-slate-500 hover:text-white"
-            >
-              <X size={isMobile ? 24 : 20} />
-            </button>
-
-            <div className="mt-2">
-              <span className="text-[10px] font-mono text-blue-400 tracking-widest uppercase">
-                Mission Selected
+            <div className="flex justify-between items-start mb-6">
+              <span className="text-[10px] font-mono text-blue-400 tracking-[0.2em] uppercase font-bold">
+                Project Detail
               </span>
-              <h3 className="mt-1 text-2xl font-black text-white leading-tight">
+              <button
+                onClick={() => setSelectedId(null)}
+                className="text-slate-500 hover:text-white transition-colors"
+              >
+                <X size={isMobile ? 24 : 20} />
+              </button>
+            </div>
+            <div className="space-y-6">
+              <h3 className="text-2xl font-black text-white leading-tight">
                 {selectedProject.title}
               </h3>
-
-              {/* 매칭 프로그레스 */}
-              <div className="mt-6 flex items-center gap-3">
+              <div className="flex items-center gap-3">
                 <div className="h-1.5 flex-1 bg-slate-800 rounded-full overflow-hidden">
                   <motion.div
                     className="h-full bg-blue-500 shadow-[0_0_10px_#3b82f6]"
@@ -150,25 +195,17 @@ export default function ProjectGalaxyView() {
                   {selectedProject.matchScore}%
                 </span>
               </div>
-
-              <p className="mt-8 text-sm leading-relaxed text-slate-400">
-                해당 프로젝트의 요구 스택과 당신의 기술 셋이 매우 높은 공명
-                지수를 보입니다.
+              <p className="text-sm leading-relaxed text-slate-400">
+                보유하신 기술 스택과 매우 높은 연관성을 가지고 있습니다. 즉시
+                프로젝트에 기여 가능한 상태입니다.
               </p>
-
-              <button className="mt-8 w-full rounded-2xl bg-blue-600 py-4 font-black text-white shadow-xl shadow-blue-900/40 active:scale-95 transition-transform">
-                프로젝트 도킹하기
+              <button className="w-full rounded-2xl bg-blue-600 py-4 font-black text-white shadow-xl shadow-blue-900/40 active:scale-95 hover:bg-blue-500 transition-all">
+                프로젝트 참여 신청
               </button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      <div className="absolute top-10 text-center pointer-events-none">
-        <h1 className="text-[10px] font-mono tracking-[0.4em] text-blue-500/40 uppercase">
-          System Orbit Active
-        </h1>
-      </div>
     </div>
   );
 }
