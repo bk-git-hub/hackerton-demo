@@ -99,7 +99,6 @@ export default function ProjectDiscoveryView() {
         projects={SAMPLE_PROJECTS}
         selectedId={selectedId}
         isMobile={isMobile}
-        dimensions={dimensions} // 화면 크기 전달
       />
 
       {/* 3. 중앙: CORE 노드 */}
@@ -143,7 +142,6 @@ export default function ProjectDiscoveryView() {
             total={SAMPLE_PROJECTS.length}
             isSelected={selectedId === project.id}
             isMobile={isMobile}
-            dimensions={dimensions} // 화면 크기 전달
             onClick={() => setSelectedId(project.id)}
           />
         ))}
