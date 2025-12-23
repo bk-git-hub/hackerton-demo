@@ -69,9 +69,12 @@ export default function ProjectList() {
                         관리를 돕는 프로젝트입니다.
                       </p>
                     </div>
-                    <button className="rounded-full bg-slate-800 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-slate-700">
+                    <a
+                      href="/projects/123"
+                      className="rounded-full bg-slate-800 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-slate-700"
+                    >
                       상세 보기
-                    </button>
+                    </a>
                   </div>
                 </div>
               ))}
