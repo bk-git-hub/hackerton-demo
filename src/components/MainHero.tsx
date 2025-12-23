@@ -30,7 +30,7 @@ export default function MainHero() {
 
         {/* 수정: 기술 주파수/안착 -> 기술 스택 분석/최적화된 매칭 */}
         <p className="mx-auto max-w-xl text-lg font-medium text-slate-400">
-          오르빗은 사용자의 기술 스택을 분석하여{' '}
+          우주매치는 사용자의 기술 스택을 분석하여{' '}
           <br className="hidden md:block" />
           가장 효율적인 팀 빌딩과 매칭 경험을 제공합니다.
         </p>
